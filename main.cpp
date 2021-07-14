@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <windows.h>
+#include <string>
 //#include <conio.h>
 using namespace std;
 
@@ -70,6 +71,33 @@ void aboutMe()
     cout << "ABOUT ME";
 }
 
+void drawField()
+{
+    cout << "\t\tColunas" << endl
+         << "\t   "; //3 spaces
+
+    for (int i = 0; i < 5; i++)
+    {
+        cout << " " << i << "  ";
+    }
+    cout << endl;
+    for (int i = 0; i < 5; i++)
+    {
+        cout << "Linha " << i << " -> "; //1space
+        for (int j = 0; j < 5; j++)
+        {
+            cout << " " << ((field[i][j] != -1) ? to_string(field[i][j]) : ("*")) << " |";
+        }
+        cout << endl
+             << "\t   ";
+        for (int i = 0; i < 5; i++)
+        {
+            cout << "---+";
+        }
+        cout << endl;
+    }
+}
+
 void newGame()
 {
     cout << "NEW GAME";
@@ -104,22 +132,9 @@ void newGame()
             break;
         }
         pause();
-        clear();
     } while (level<1 | level> 4);
-
-
-
-}
-
-void drawField()
-{
-    for (int i = 0; i < 5; i++)
-    {
-        for (int j = 0; j < 5; j++)
-        {
-            cout << field[i][j];
-        }
-    }
+    clear();
+    drawField();
 }
 
 int main()
@@ -134,6 +149,10 @@ int main()
             field[i][j] = 0;
         }
     }
+
+    drawField();
+    pause();
+    return 0;
 
     do
     {
