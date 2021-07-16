@@ -1,19 +1,18 @@
 #include <iostream>
 #include <ctime>
-
 #include <windows.h>
 #include <string>
 //#include <conio.h>
 using namespace std;
 
-#define VERSION_GAME 0.1
+#define VERSION_GAME 0.3
 
 int field[5][5], option = 0, level = 0, fieldMirror[5][5];
 string playerName = "";
-string msgBeginner = "O Nivel facil tem 5 minas espalhadas pelo campo.\n";
-string msgEasy = "O Nivel facil tem 5 minas espalhadas pelo campo.\n";
-string msgMiddle = "O Nivel facil tem 5 minas espalhadas pelo campo.\n";
-string msgHard = "O Nivel facil tem 5 minas espalhadas pelo campo.\n";
+string msgBeginner = "O Nivel Iniciante tem 3 minas espalhadas pelo campo.\n";
+string msgEasy = "O Nivel facil tem 6 minas espalhadas pelo campo.\n";
+string msgMiddle = "O Nivel Intermediario tem 9 minas espalhadas pelo campo.\n";
+string msgHard = "O Nivel Dificil tem 12 minas espalhadas pelo campo.\n";
 
 void pause()
 {
@@ -64,16 +63,19 @@ void drawDifficultMenu()
 
 void aboutGame()
 {
-    cout << "ABOUT GAME";
+    cout << "SOBRE O JOGO\nJogo de Campo Minado exigido como requisito parcial da materia de IAP - Introducao a Programacao.";
 }
 
 void aboutMe()
 {
-    cout << "ABOUT ME";
+    cout << "SOBRE MIM\nMarcos Daniel, tecnico em informatica e futuro bacharel em sistemas de informacao.";
 }
 
 void drawField()
 {
+    HANDLE colors = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(colors, 14); //Amarelo
+
     cout << "\t\tColunas" << endl
          << "\t   "; //3 spaces
 
@@ -84,14 +86,27 @@ void drawField()
     cout << endl;
     for (int i = 0; i < 5; i++)
     {
-        cout << "Linha " << i << " -> "; //1space
+        SetConsoleTextAttribute(colors, 14); //Amarelo
+        cout << "Linha " << i << " -> ";
         for (int j = 0; j < 5; j++)
         {
-            /**
-             * TODO Change "field" per "fieldMirror"
-             */
-            //cout << " " << (field[i][j] == -2 ? " " : (field[i][j] == -1 ? "*" : to_string(field[i][j]))) << " |";
-            cout << " " << field[i][j] << " |";
+            cout << " ";
+            if (fieldMirror[i][j] == -2)
+            {
+                cout << " ";
+            }
+            else if (fieldMirror[i][j] == -1)
+            {
+                SetConsoleTextAttribute(colors, 4); //Vermelho
+                cout << "*";
+            }
+            else
+            {
+                SetConsoleTextAttribute(colors, 9); //Azul
+                cout << fieldMirror[i][j];
+            }
+            SetConsoleTextAttribute(colors, 14); //Amarelo
+            cout << " |";
         }
         cout << "\n\t   ";
         for (int i = 0; i < 5; i++)
@@ -102,26 +117,39 @@ void drawField()
     }
 }
 
-/**
- * Retorna true se 
- */
-bool verifyBomb()
+void inicializerField()
 {
-    return true;
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 5; j++) // -2 -> vazio
+        {                           //
+            field[i][j] = 0;        //
+            fieldMirror[i][j] = -2;
+        }
+    }
+}
+
+/**
+ * Retorna true se encontrar uma bomba
+ * na posicao passada e false se nao encontrar
+ */
+bool verifyBomb(int *row, int *col)
+{
+    return (field[*row][*col] == -1 ? true : false);
 }
 
 void addBombs(int rowInitial, int colInitial)
 {
     int seed = time(NULL);
     srand(seed);
-    int bombs = (level / 8) * 25;
+    int bombs = (level / 8.0) * 25.0;
     int rowSelected, colSelected;
     for (int i = 0; i < bombs; i++)
     {
         while (true)
         {
-            rowSelected = (rand() % 6) - 1;
-            colSelected = (rand() % 6) - 1;
+            rowSelected = (rand() % 6);
+            colSelected = (rand() % 6);
             if ((rowSelected != rowInitial || colSelected != colInitial) && field[rowSelected][colSelected] != -1)
             {
                 field[rowSelected][colSelected] = -1;
@@ -133,9 +161,12 @@ void addBombs(int rowInitial, int colInitial)
 
 void mountCel(int *cel)
 {
+    // cout << "*CEL : " << *cel << endl
+    //      << "&CEL: " << &cel << endl
+    //      << "CEL: " << cel << endl;
     if (*cel != -1)
     {
-        *cel++;
+        *cel += 1;
     }
 }
 
@@ -220,15 +251,20 @@ void mountField()
     }
 }
 
+void showCell(int row, int col)
+{
+    fieldMirror[row][col] = field[row][col];
+}
+
 void newGame()
 {
-    cout << "NEW GAME";
-    cout << "Digite seu nome: ";
-    cin >> playerName;
-    if (playerName == "")
+    
+    inicializerField();
+    do
     {
-        return;
-    }
+        cout << "Digite seu nome: ";
+        cin >> playerName;
+    } while (playerName == "");
 
     do
     {
@@ -269,41 +305,35 @@ void newGame()
         if (turn == 1)
         {
             addBombs(row, col);
+            mountField();
         }
+        showCell(row, col);
         turn++;
+        if (verifyBomb(&row, &col))
+        {
+            clear();
+            cout << "\nBOOOMMM\nAh shit, voce perdeu!\n\n";
+
+            for (int i = 0; i < 4; i++)
+            {
+                Beep(300, 150);
+            }
+
+            drawField();
+            pause();
+            return;
+        };
     }
 }
 
 int main()
 {
-    /**
-     * Inicializacao do campo.
-     */
-    for (int i = 0; i < 5; i++)
-    {
-        for (int j = 0; j < 5; j++) // -2 -> vazio
-        {                           //
-            field[i][j] = 0;        //
-            fieldMirror[i][j] = -2;
-        }
-    }
-
-    //Test
-
-    level = 4;
-    addBombs(1, 1);
-    mountField();
-    drawField();
-
-    return 0;
-
-    //End Test
-
     do
     {
+        clear();
         drawInitialMenu();
         cin >> option;
-
+        clear();
         switch (option)
         {
         case 1:
@@ -322,6 +352,12 @@ int main()
             cout << "Opcao invalida!";
             break;
         }
+        if (option >= 1 && option <= 4)
+        {
+            cout << "\n\nDeseja continuar? \n\t(0) - SIM\n\t(1) - NAO ";
+            cin >> option;
+            clear();
+        }
 
     } while (option < 1 || option > 4);
 
@@ -335,8 +371,5 @@ COORD c;
 
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
 
-    for (int i = 0; i < 4; i++)
-    {
-        Beep(300, 150);
-    }
+    
 */
