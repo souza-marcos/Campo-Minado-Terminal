@@ -5,7 +5,7 @@
 //#include <conio.h>
 using namespace std;
 
-#define VERSION_GAME 0.3
+#define VERSION_GAME 0.4
 
 int field[5][5], option = 0, level = 0, fieldMirror[5][5];
 string playerName = "";
@@ -68,7 +68,7 @@ void aboutGame()
 
 void aboutMe()
 {
-    cout << "SOBRE MIM\nMarcos Daniel, tecnico em informatica e futuro bacharel em sistemas de informacao.";
+    cout << "SOBRE MIM\nMarcos Daniel, tecnico em informatica e estudante do curso de sistemas de informacao.";
 }
 
 void drawField()
@@ -114,6 +114,7 @@ void drawField()
             cout << "---+";
         }
         cout << endl;
+        SetConsoleTextAttribute(colors, 15);
     }
 }
 
@@ -258,7 +259,7 @@ void showCell(int row, int col)
 
 void newGame()
 {
-    
+
     inicializerField();
     do
     {
@@ -312,17 +313,33 @@ void newGame()
         if (verifyBomb(&row, &col))
         {
             clear();
-            cout << "\nBOOOMMM\nAh shit, voce perdeu!\n\n";
-
-            for (int i = 0; i < 4; i++)
-            {
-                Beep(300, 150);
-            }
-
+            cout << "\nBOOOMMM\nVoce perdeu!\n\n";
+            Beep(500, 1000);
             drawField();
             pause();
             return;
         };
+        if (turn == (26 - (level * 3)))
+        {
+            clear();
+            cout << "\nVoce Ganhou! Parabens!\n\n";
+            
+            //Music Victory Credits: https://github.com/ShaneMcC/beeps/blob/master/ff-victory.sh
+            Beep(784, 100);
+            Sleep(100);
+            Beep(784, 600);
+            Beep(622, 600);
+            Beep(698, 600);
+            Beep(784, 200);
+            Sleep(200);
+            Beep(698, 200);
+            Beep(784, 800);
+            //End Music Victory
+
+            drawField();
+            pause();
+            return;
+        }
     }
 }
 
