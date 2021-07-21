@@ -7,13 +7,70 @@ using namespace std;
 
 #define VERSION_GAME 0.4
 
-int field[5][5], option = 0, level = 0, fieldMirror[5][5];
+int field[5][5], level = 0, fieldMirror[5][5];
 string playerName = "";
 string msgBeginner = "O Nivel Iniciante tem 3 minas espalhadas pelo campo.\n";
 string msgEasy = "O Nivel facil tem 6 minas espalhadas pelo campo.\n";
 string msgMiddle = "O Nivel Intermediario tem 9 minas espalhadas pelo campo.\n";
 string msgHard = "O Nivel Dificil tem 12 minas espalhadas pelo campo.\n";
 
+void pause();
+void clear();
+void drawInitialMenu();
+void drawDifficultMenu();
+void aboutGame();
+void aboutMe();
+void drawField();
+void inicializerField();
+bool verifyBomb(int *row, int *col);
+void addBombs(int rowInitial, int colInitial);
+void mountCel(int *cel);
+void mountField();
+void showCell(int row, int col);
+void newGame();
+
+int main()
+{
+    int option = 0;
+    do
+    {
+        clear();
+        drawInitialMenu();
+        cin >> option;
+        clear();
+        switch (option)
+        {
+        case 1:
+            newGame();
+            break;
+        case 2:
+            aboutGame();
+            break;
+        case 3:
+            aboutMe();
+            break;
+        case 4:
+            cout << "VOLTE SEMPRE! FLW.";
+            return 0;
+        default:
+            cout << "Opcao invalida!";
+            break;
+        }
+        if (option >= 1 && option <= 4)
+        {
+            cout << "\n\nDeseja continuar? \n\t(0) - SIM\n\t(1) - NAO ";
+            cin >> option;
+            clear();
+        }
+
+    } while (option < 1 || option > 4);
+
+    return 0;
+}
+
+/**
+ * Pausa o terminal.
+ */
 void pause()
 {
     cout << endl
@@ -22,6 +79,9 @@ void pause()
     getchar();
 }
 
+/**
+ * Limpa o terminal.
+ */
 void clear()
 {
 #ifdef WIN32
@@ -33,12 +93,14 @@ void clear()
 #endif
 }
 
+/**
+ * Desenha o Menu Inicial no terminal.
+ */
 void drawInitialMenu()
 {
     cout << "-------- CAMPO MINADO v." << VERSION_GAME << " --------" << endl
          << endl
-         << "Menu Principal" << endl
-         << endl
+         << "Menu Principal"
          << "(1) Novo Jogo" << endl
          << "(2) Sobre o Jogo" << endl
          << "(3) Sobre mim" << endl
@@ -47,6 +109,9 @@ void drawInitialMenu()
          << "Sua opcao: ";
 }
 
+/**
+ * Desenha o Menu de Dificuldade no teminal.
+ */
 void drawDifficultMenu()
 {
     cout << "-------- CAMPO MINADO v." << VERSION_GAME << " --------" << endl
@@ -61,16 +126,25 @@ void drawDifficultMenu()
          << "Sua opcao: ";
 }
 
+/**
+ * Desenha as informacoes sobre o jogo no terminal.
+ */
 void aboutGame()
 {
     cout << "SOBRE O JOGO\nJogo de Campo Minado exigido como requisito parcial da materia de IAP - Introducao a Programacao.";
 }
 
+/**
+ * Desenha as informacoes sobre o autor desse programa no terminal.
+ */
 void aboutMe()
 {
     cout << "SOBRE MIM\nMarcos Daniel, tecnico em informatica e estudante do curso de sistemas de informacao.";
 }
 
+/**
+ * Desenha o campo no terminal de acordo com seu estado(lugares ocultos, nao ocultos, etc)
+ */
 void drawField()
 {
     HANDLE colors = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -118,6 +192,9 @@ void drawField()
     }
 }
 
+/**
+ * Inicializa o Campo, tanto o espelho que o usuario ve quanto o campo necessario para o algoritmo.
+ */
 void inicializerField()
 {
     for (int i = 0; i < 5; i++)
@@ -131,14 +208,22 @@ void inicializerField()
 }
 
 /**
- * Retorna true se encontrar uma bomba
- * na posicao passada e false se nao encontrar
+ * Verica se existe bomba em determinada localizacao.
+ * @param int* row : endereco da linha do campo.
+ * @param int* col : endereco da coluna do campo.
+ * @return True se existe bomba na celula e false se nao existe. 
  */
 bool verifyBomb(int *row, int *col)
 {
     return (field[*row][*col] == -1 ? true : false);
 }
 
+/**
+ * Verica se existe bomba em determinada localizacao.
+ * @param int* row : endereco da linha do campo.
+ * @param int* col : endereco da coluna do campo.
+ * @return True se existe bomba na celula e false se nao existe. 
+ */
 void addBombs(int rowInitial, int colInitial)
 {
     int seed = time(NULL);
@@ -323,7 +408,7 @@ void newGame()
         {
             clear();
             cout << "\nVoce Ganhou! Parabens!\n\n";
-            
+
             //Music Victory Credits: https://github.com/ShaneMcC/beeps/blob/master/ff-victory.sh
             Beep(784, 100);
             Sleep(100);
@@ -341,44 +426,6 @@ void newGame()
             return;
         }
     }
-}
-
-int main()
-{
-    do
-    {
-        clear();
-        drawInitialMenu();
-        cin >> option;
-        clear();
-        switch (option)
-        {
-        case 1:
-            newGame();
-            break;
-        case 2:
-            aboutGame();
-            break;
-        case 3:
-            aboutMe();
-            break;
-        case 4:
-            cout << "VOLTE SEMPRE! FLW.";
-            return 0;
-        default:
-            cout << "Opcao invalida!";
-            break;
-        }
-        if (option >= 1 && option <= 4)
-        {
-            cout << "\n\nDeseja continuar? \n\t(0) - SIM\n\t(1) - NAO ";
-            cin >> option;
-            clear();
-        }
-
-    } while (option < 1 || option > 4);
-
-    return 0;
 }
 
 /*
