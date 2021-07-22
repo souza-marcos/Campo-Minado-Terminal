@@ -347,7 +347,7 @@ void newGame()
     inicializerField();
     do
     {
-        cout << "Digite seu nome: ";
+        cout << "Digite seu nome: ";//Teste user souza-marcos
         cin >> playerName;
     } while (playerName == "");
 
