@@ -1,8 +1,6 @@
 #include <iostream>
 #include <ctime>
 #include <windows.h>
-#include <string>
-//#include <conio.h>
 using namespace std;
 
 #define VERSION_GAME 0.4
@@ -22,16 +20,19 @@ void aboutGame();
 void aboutMe();
 void drawField();
 void inicializerField();
-bool verifyBomb(int *row, int *col);
+bool verifyBomb(int row, int col);
 void addBombs(int rowInitial, int colInitial);
-void mountCel(int *cel);
+void mountCel(int row, int col);
 void mountField();
 void showCell(int row, int col);
+bool validatePosition(int row, int col);
+void drawFullField();
 void newGame();
 
 int main()
 {
     int option = 0;
+
     do
     {
         clear();
@@ -58,7 +59,7 @@ int main()
         }
         if (option >= 1 && option <= 4)
         {
-            cout << "\n\nDeseja continuar? \n\t(0) - SIM\n\t(1) - NAO ";
+            cout << "\n\nVoltar ao menu INICIAL? \n\t(0) - SIM, Quero Voltar.\n\t(1) - NAO, Quero sair do jogo. ";
             cin >> option;
             clear();
         }
@@ -100,7 +101,7 @@ void drawInitialMenu()
 {
     cout << "-------- CAMPO MINADO v." << VERSION_GAME << " --------" << endl
          << endl
-         << "Menu Principal"
+         << "Menu Principal" << endl
          << "(1) Novo Jogo" << endl
          << "(2) Sobre o Jogo" << endl
          << "(3) Sobre mim" << endl
@@ -131,7 +132,21 @@ void drawDifficultMenu()
  */
 void aboutGame()
 {
-    cout << "SOBRE O JOGO\nJogo de Campo Minado exigido como requisito parcial da materia de IAP - Introducao a Programacao.";
+    cout << "SOBRE O JOGO\n";
+    cout <<
+        R"(
+      Campo minado e um popular
+      jogo de computador para um
+      jogador. Foi inventado por
+      Robert Donner em 1989 e 
+      como objectivo revelar um 
+      campo de minas sem que alguma
+      seja detonada. Este jogo 
+      tem sido reescrito para as
+      mais diversas plataformas, 
+      sendo a sua versao mais 
+      popular a que vinha nativamente
+      nas edicoes anteriores ao Windows 10.(WIKIPEDIA) )";
 }
 
 /**
@@ -209,33 +224,32 @@ void inicializerField()
 
 /**
  * Verica se existe bomba em determinada localizacao.
- * @param int* row : endereco da linha do campo.
- * @param int* col : endereco da coluna do campo.
+ * @param *row endereco da linha do campo.
+ * @param *col endereco da coluna do campo.
  * @return True se existe bomba na celula e false se nao existe. 
  */
-bool verifyBomb(int *row, int *col)
+bool verifyBomb(int row, int col)
 {
-    return (field[*row][*col] == -1 ? true : false);
+    return (field[row][col] == -1 ? true : false);
 }
 
 /**
- * Verica se existe bomba em determinada localizacao.
- * @param int* row : endereco da linha do campo.
- * @param int* col : endereco da coluna do campo.
- * @return True se existe bomba na celula e false se nao existe. 
+ * Adiciona as bombas no campo, de modo que a primeira jogada nunca sera uma bomba.
+ * @param rowInitial a linha da primeira jogada.
+ * @param colInitial a coluna da primeira jogada.
  */
 void addBombs(int rowInitial, int colInitial)
 {
     int seed = time(NULL);
     srand(seed);
-    int bombs = (level / 8.0) * 25.0;
+    int bombs = (level / 8.0) * 25.0; // Quantidade de bombas de acordo com o nivel escolhido.
     int rowSelected, colSelected;
     for (int i = 0; i < bombs; i++)
     {
         while (true)
         {
-            rowSelected = (rand() % 6);
-            colSelected = (rand() % 6);
+            rowSelected = (rand() % 5);
+            colSelected = (rand() % 5);
             if ((rowSelected != rowInitial || colSelected != colInitial) && field[rowSelected][colSelected] != -1)
             {
                 field[rowSelected][colSelected] = -1;
@@ -245,17 +259,29 @@ void addBombs(int rowInitial, int colInitial)
     }
 }
 
-void mountCel(int *cel)
+/**
+ * Monta a celula do campo 
+ */
+void mountCel(int row, int col)
 {
-    // cout << "*CEL : " << *cel << endl
-    //      << "&CEL: " << &cel << endl
-    //      << "CEL: " << cel << endl;
-    if (*cel != -1)
+    if (row == 4)
     {
-        *cel += 1;
+        Sleep(100);
+    }
+
+    if (row < 0 || row > 4 || col < 0 || col > 4 || field[row][col] == -1)
+    {
+        return;
+    }
+    else
+    {
+        field[row][col] += 1;
     }
 }
 
+/**
+ * Monta o campo - adiciona os corretos numeros.
+ */
 void mountField()
 {
     for (int i = 0; i < 5; i++)
@@ -264,82 +290,55 @@ void mountField()
         {
             if (field[i][j] == -1)
             {
-                if (i == 0)
-                {
-                    if (j == 0)
-                    {
-                        mountCel(&field[i][j + 1]);
-                        mountCel(&field[i + 1][j + 1]);
-                    }
-                    else if (j == 4)
-                    {
-                        mountCel(&field[i][j - 1]);
-                        mountCel(&field[i + 1][j - 1]);
-                    }
-                    else
-                    {
-                        mountCel(&field[i][j + 1]);
-                        mountCel(&field[i][j - 1]);
-                        mountCel(&field[i + 1][j - 1]);
-                        mountCel(&field[i + 1][j + 1]);
-                    }
-                    mountCel(&field[i + 1][j]);
-                }
-                else if (i == 4)
-                {
-                    if (j == 0)
-                    {
-                        mountCel(&field[i][j + 1]);
-                        mountCel(&field[i - 1][j + 1]);
-                    }
-                    else if (j == 4)
-                    {
-                        mountCel(&field[i][j - 1]);
-                        mountCel(&field[i - 1][j - 1]);
-                    }
-                    else
-                    {
-                        mountCel(&field[i][j + 1]);
-                        mountCel(&field[i][j - 1]);
-                        mountCel(&field[i - 1][j - 1]);
-                        mountCel(&field[i - 1][j + 1]);
-                    }
-                    mountCel(&field[i - 1][j]);
-                }
-                else
-                {
-                    if (j == 0)
-                    {
-                        mountCel(&field[i][j + 1]);
-                        mountCel(&field[i + 1][j + 1]);
-                        mountCel(&field[i - 1][j + 1]);
-                    }
-                    else if (j == 4)
-                    {
-                        mountCel(&field[i][j - 1]);
-                        mountCel(&field[i + 1][j - 1]);
-                        mountCel(&field[i - 1][j - 1]);
-                    }
-                    else
-                    {
-                        mountCel(&field[i - 1][j - 1]);
-                        mountCel(&field[i - 1][j + 1]);
-                        mountCel(&field[i][j + 1]);
-                        mountCel(&field[i + 1][j + 1]);
-                        mountCel(&field[i + 1][j - 1]);
-                        mountCel(&field[i][j - 1]);
-                    }
-                    mountCel(&field[i - 1][j]);
-                    mountCel(&field[i + 1][j]);
-                }
+                int iPos = (i + 1), iAnt = (i - 1);
+                int jPos = (j + 1), jAnt = (j - 1);
+                mountCel(iAnt, jAnt);
+                mountCel(iAnt, j);
+                mountCel(iAnt, jPos);
+                mountCel(i, jPos);
+                mountCel(iPos, jPos);
+                mountCel(iPos, j);
+                mountCel(iPos, jAnt);
+                mountCel(i, jAnt);
             }
         }
     }
 }
 
+/**
+ * Revela o valor da celula.
+ */
 void showCell(int row, int col)
 {
     fieldMirror[row][col] = field[row][col];
+}
+
+bool validatePosition(int row, int col)
+{
+    if (row < 0 || row > 4 || col < 0 || col > 4)
+    {
+        cout << "\nPosicao invalida!\n";
+        return false;
+    }
+
+    if (fieldMirror[row][col] != -2 && fieldMirror[row][col] != -1)
+    {
+        cout << "\nPosicao ja visualizada!\n";
+        return false;
+    }
+    return true;
+}
+
+void drawFullField()
+{
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 5; j++)
+        {
+            fieldMirror[i][j] = field[i][j];
+        }
+    }
+    drawField();
 }
 
 void newGame()
@@ -388,19 +387,26 @@ void newGame()
         cout << "Digite a coluna desejada: ";
         cin >> col;
 
+        if (!validatePosition(row, col))
+        {
+            pause();
+            continue;
+        }
+
         if (turn == 1)
         {
             addBombs(row, col);
             mountField();
         }
+
         showCell(row, col);
         turn++;
-        if (verifyBomb(&row, &col))
+        if (verifyBomb(row, col))
         {
             clear();
             cout << "\nBOOOMMM\nVoce perdeu!\n\n";
             Beep(500, 1000);
-            drawField();
+            drawFullField();
             pause();
             return;
         };
@@ -421,19 +427,9 @@ void newGame()
             Beep(784, 800);
             //End Music Victory
 
-            drawField();
+            drawFullField();
             pause();
             return;
         }
     }
 }
-
-/*
-COORD c;
-    c.X = 10;
-    c.Y = 10;
-
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
-
-    
-*/
