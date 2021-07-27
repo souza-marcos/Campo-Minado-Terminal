@@ -3,7 +3,7 @@
 #include <windows.h>
 using namespace std;
 
-#define VERSION_GAME 0.4
+#define VERSION_GAME 1.0
 
 int field[5][5], level = 0, fieldMirror[5][5];
 string playerName = "";
@@ -117,7 +117,7 @@ void drawDifficultMenu()
 {
     cout << "-------- CAMPO MINADO v." << VERSION_GAME << " --------" << endl
          << endl
-         << playerName << ", escolha un nivel de dificuldade " << endl
+         << playerName << ", escolha um nivel de dificuldade " << endl
          << endl
          << "(1) - Iniciante" << endl
          << "(2) - Facil" << endl
@@ -352,7 +352,6 @@ void drawFullField()
     }
     drawField();
 }
-
 
 /**
  * Funcao para a logica do jogo em si. Novo jogo e criado.
