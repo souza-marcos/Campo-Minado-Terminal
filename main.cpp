@@ -2,8 +2,8 @@
 #include <ctime>
 #include <windows.h>
 using namespace std;
-
-#define VERSION_GAME 1.0
+//test rename repository
+#define VERSION_GAME 1.1
 
 int field[5][5], level = 0, fieldMirror[5][5];
 string playerName = "";
