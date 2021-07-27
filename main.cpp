@@ -75,7 +75,7 @@ int main()
 void pause()
 {
     cout << endl
-         << "Pressione alguma tecla para continuar ... ";
+         << "Pressione ENTER para continuar ... ";
     getchar(); // ENTER BEFORE
     getchar();
 }
@@ -224,8 +224,8 @@ void inicializerField()
 
 /**
  * Verica se existe bomba em determinada localizacao.
- * @param *row endereco da linha do campo.
- * @param *col endereco da coluna do campo.
+ * @param row linha do campo.
+ * @param col coluna do campo.
  * @return True se existe bomba na celula e false se nao existe. 
  */
 bool verifyBomb(int row, int col)
@@ -260,7 +260,10 @@ void addBombs(int rowInitial, int colInitial)
 }
 
 /**
- * Monta a celula do campo 
+ * Monta a celula do campo - Incrementa o numero da celula caso haja bomba ao redor
+ * ESTRITAMENTE auxiliar a funcao mountField.
+ * @param row linha da celula
+ * @param col coluna da celula
  */
 void mountCel(int row, int col)
 {
@@ -280,7 +283,7 @@ void mountCel(int row, int col)
 }
 
 /**
- * Monta o campo - adiciona os corretos numeros.
+ * Monta o campo - adiciona os numeros de acordo com as bombas ao redor.
  */
 void mountField()
 {
@@ -313,6 +316,11 @@ void showCell(int row, int col)
     fieldMirror[row][col] = field[row][col];
 }
 
+/** 
+ * Funcao que valida a posicao inserida pelo usuario.
+ * @param row linha da celula
+ * @param col coluna da celula
+ */ 
 bool validatePosition(int row, int col)
 {
     if (row < 0 || row > 4 || col < 0 || col > 4)
@@ -329,6 +337,10 @@ bool validatePosition(int row, int col)
     return true;
 }
 
+/**
+ * Funcao que desenha o campo com todas os lugares ja visiveis. 
+ * WARNING: A funcao vai redefinir a matriz espelho. (FieldMirror) 
+ */
 void drawFullField()
 {
     for (int i = 0; i < 5; i++)
@@ -341,6 +353,10 @@ void drawFullField()
     drawField();
 }
 
+
+/**
+ * Funcao para a logica do jogo em si. Novo jogo e criado.
+ */
 void newGame()
 {
 
@@ -351,6 +367,7 @@ void newGame()
         cin >> playerName;
     } while (playerName == "");
 
+    // Menu de dificuldade
     do
     {
         clear();
@@ -376,6 +393,7 @@ void newGame()
         }
         pause();
     } while (level < 1 || level > 4);
+    
     int turn = 1;
     while (true)
     {
@@ -409,7 +427,8 @@ void newGame()
             drawFullField();
             pause();
             return;
-        };
+        }
+
         if (turn == (26 - (level * 3)))
         {
             clear();
